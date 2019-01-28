@@ -21,6 +21,7 @@
  */
 #include <SPI.h>
 #include <Time.h>
+#include <TimeLib.h> # // For setSyncProvider
 #include "DMAChannel.h"
 
 #define CONFIG_FONT_HERSHEY
@@ -31,9 +32,9 @@
 #include "asteroids_font.h"
 #endif
 
-//#define CONFIG_VECTREX
+#define CONFIG_VECTREX
 //#define CONFIG_VECTORSCOPE
-#define CONFIG_LBO51MA
+//#define CONFIG_LBO51MA
 
 // If you just want a scope clock,
 // solder a 32.768 KHz crystal to the teensy and provide a backup
@@ -180,10 +181,7 @@ static unsigned spi_dma_cs; // which pins are we using for IO
 #define SPI_DMA_CS_BEAM_OFF 1
 
 
-static int
-spi_dma_tx_append(
-	uint16_t value
-)
+int spi_dma_tx_append(uint16_t value)
 {
 	spi_dma_q[spi_dma_which][spi_dma_count++] = 0
 		| ((uint32_t) value)
@@ -196,8 +194,7 @@ spi_dma_tx_append(
 }
 
 
-static void
-spi_dma_tx()
+void spi_dma_tx()
 {
 	if (spi_dma_count == 0)
 		return;
@@ -229,8 +226,7 @@ spi_dma_tx()
 }
 
 
-static int
-spi_dma_tx_complete()
+int spi_dma_tx_complete()
 {
 	//cli();
 
@@ -264,8 +260,7 @@ spi_dma_tx_complete()
 }
 
 
-static void
-spi_dma_setup()
+void spi_dma_setup()
 {
 	spi_dma.disable();
 	spi_dma.destination((volatile uint32_t&) SPI0_PUSHR);
@@ -294,12 +289,7 @@ spi_dma_setup()
 }
 
 
-void
-rx_append(
-	int x,
-	int y,
-	unsigned bright
-)
+void rx_append(int x, int y, unsigned bright)
 {
 	// store the 12-bits of x and y, as well as 6 bits of brightness
 	// (three in X and three in Y)
@@ -307,34 +297,25 @@ rx_append(
 }
 
 
-void
-moveto(int x, int y)
+void moveto(int x, int y)
 {
 	rx_append(x, y, 0);
 }
 
 
-void
-lineto(int x, int y)
+void lineto(int x, int y)
 {
 	rx_append(x, y, 24); // normal brightness
 }
 
 
-void
-brightto(int x, int y)
+void brightto(int x, int y)
 {
 	rx_append(x, y, 63); // max brightness
 }
 
 
-int
-draw_character(
-	char c,
-	int x,
-	int y,
-	int size
-)
+int draw_character(char c, int x, int y, int size)
 {
 #ifdef CONFIG_FONT_HERSHEY
 	const hershey_char_t * const f = &hershey_simplex[c - ' '];
@@ -397,13 +378,7 @@ draw_character(
 }
 
 
-void
-draw_string(
-	const char * s,
-	int x,
-	int y,
-	int size
-)
+void draw_string(const char * s, int x, int y, int size)
 {
 	while(*s)
 	{
@@ -412,8 +387,7 @@ draw_string(
 	}
 }
 
-static void
-draw_test_pattern()
+void draw_test_pattern()
 {
 	// fill in some points for test and calibration
 	moveto(0,0);
@@ -514,16 +488,14 @@ draw_test_pattern()
 }
 
 
-static time_t
-teensy3_rtc()
+time_t teensy3_rtc()
 {
 	return Teensy3Clock.get();
 }
 
 
 
-void
-setup()
+void setup()
 {
 	// set the Time library to use Teensy 3.0's RTC to keep time
 	setSyncProvider(teensy3_rtc);
@@ -566,11 +538,7 @@ setup()
 }
 
 
-static void
-mpc4921_write(
-	int channel,
-	uint16_t value
-)
+void mpc4921_write(int channel,	uint16_t value)
 {
 	value &= 0x0FFF; // mask out just the 12 bits of data
 
@@ -613,10 +581,7 @@ static uint16_t y_pos;
 #define DAC_Y_CHAN 1
 #endif
 
-static inline void
-goto_x(
-	uint16_t x
-)
+inline void goto_x(uint16_t x)
 {
 	x_pos = x;
 #ifdef FLIP_X
@@ -626,10 +591,7 @@ goto_x(
 #endif
 }
 
-static inline void
-goto_y(
-	uint16_t y
-)
+inline void goto_y(uint16_t y)
 {
 	y_pos = y;
 #ifdef FLIP_Y
@@ -640,10 +602,7 @@ goto_y(
 }
 
 
-static void
-dwell(
-	const int count
-)
+void dwell(const int count)
 {
 	for (int i = 0 ; i < count ; i++)
 	{
@@ -654,10 +613,7 @@ dwell(
 	}
 }
 
-static inline void
-brightness(
-	uint16_t bright
-)
+inline void brightness(uint16_t bright)
 {
 #ifdef CONFIG_BRIGHTNESS
 	static unsigned last_bright;
@@ -683,12 +639,7 @@ brightness(
 #endif
 }
 
-static inline void
-_draw_lineto(
-	int x1,
-	int y1,
-	const int bright_shift
-)
+inline void _draw_lineto(int x1, int y1, const int bright_shift)
 {
 	int dx;
 	int dy;
@@ -762,12 +713,7 @@ _draw_lineto(
 }
 
 
-void
-draw_lineto(
-	int x1,
-	int y1,
-	unsigned bright
-)
+void draw_lineto(int x1, int y1, unsigned bright)
 {
 	brightness(bright);
 	_draw_lineto(x1, y1, NORMAL_SHIFT);
@@ -775,11 +721,7 @@ draw_lineto(
 
 
 
-void
-draw_moveto(
-	int x1,
-	int y1
-)
+void draw_moveto(int x1, int y1)
 {
 	brightness(0);
 
@@ -796,13 +738,7 @@ draw_moveto(
 }
 
 
-void
-_circle(
-	int cx,
-	int cy,
-	int r,
-	int octant
-)
+void _circle(int cx, int cy, int r, int octant)
 {
 	int x = r;
 	int y = 0;
@@ -834,8 +770,7 @@ _circle(
 
 
 
-uint8_t
-read_blocking()
+uint8_t read_blocking()
 {
 	while(1)
 	{
@@ -846,8 +781,7 @@ read_blocking()
 }
 
 
-static int
-read_data()
+int read_data()
 {
 	static uint32_t cmd;
 	static unsigned offset;
@@ -911,8 +845,7 @@ read_data()
 }
 
 
-void
-loop()
+void loop()
 {
 	//Serial.print(fb);
 	//Serial.print(' ');

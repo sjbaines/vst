@@ -8,12 +8,7 @@
 const int cx = 1024;
 const int cy = 1024;
 
-void
-draw_hand(
-	float a,
-	int r,
-	int hw
-)
+void draw_hand(float a, int r, int hw)
 {
 	const float sh = sin(a * M_PI/180);
 	const float ch = cos(a * M_PI/180);
@@ -22,7 +17,9 @@ draw_hand(
 	{
 		moveto(cx + r*sh/4,cy + r*ch/4);
 		brightto(cx + r*sh, cy + r*ch);
-	} else {
+	}
+    else 
+    {
 		//moveto(cx-hw*sh, cy-hw*ch);
 		moveto(cx-hw*ch, cy+hw*sh);
 		lineto(cx+r*sh, cy+r*ch);
@@ -32,15 +29,7 @@ draw_hand(
 }
 
 
-void
-draw_ymd(
-	int year,
-	int m,
-	int d,
-	int x,
-	int y,
-	int size
-)
+void draw_ymd(int year, int m, int d, int x, int y,	int size)
 {
 	char t[16];
 	t[0] = '0' + (year / 1000) % 10;
@@ -58,15 +47,7 @@ draw_ymd(
 }
 
 
-void
-draw_hms(
-	int h,
-	int m,
-	int s,
-	int x,
-	int y,
-	int size
-)
+void draw_hms(int h, int m, int s, int x, int y, int size)
 {
 	char t[16];
 	t[0] = '0' + h / 10;
@@ -83,10 +64,10 @@ draw_hms(
 }
 
 
-void
-scopeclock_analog()
+void scopeclock_analog()
 {
-	if (timeStatus()!= timeSet) {
+	if (timeStatus()!= timeSet) 
+    {
 		draw_string("time invalid: unable to sync", 0, 0, 8);
 	}
 
@@ -107,8 +88,8 @@ scopeclock_analog()
 			lineto(cx + st*r2 + 20 , cy + ct*r2);
 			lineto(cx + st*rh + 20, cy + ct*rh);
 			lineto(cx + st*rh - 20, cy + ct*rh);
-		} else
-		if (t % 15 == 0)
+		}
+        else if (t % 15 == 0)
 		{
 			// normal hour
 			if (t % 30 == 0)
@@ -123,8 +104,8 @@ scopeclock_analog()
 				cx + st*(r1-150) - 12*6,
 				cy + ct*(r1-150) - 5*6,
 				5);
-		} else
-		if (t % 6 == 0)
+		} 
+        else if (t % 6 == 0)
 		{
 			// normal second/minute marker
 			moveto(cx + st*r1, cy + ct*r1);
@@ -160,10 +141,10 @@ scopeclock_analog()
 }
 
 
-void
-scopeclock_digital()
+void scopeclock_digital()
 {
-	if (timeStatus()!= timeSet) {
+	if (timeStatus()!= timeSet) 
+    {
 		draw_string("unable to sync", 0, 1024, 8);
 		return;
 	}
@@ -213,8 +194,7 @@ scopeclock_digital()
 }
 
 
-void
-alphabet_test()
+void alphabet_test()
 {
 	int size = 13; // hershey
 	//int size = 17; // asteroids
@@ -225,8 +205,7 @@ alphabet_test()
 	draw_string("%^&*()/=+{", 0,  200, size);
 }
 
-void
-scopeclock()
+void scopeclock()
 {
 	rx_points = 0;
 
