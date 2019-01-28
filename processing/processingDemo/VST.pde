@@ -3,12 +3,14 @@ import processing.serial.*;
 
 Serial createSerial() {
   // finding the right port requires picking it from the list
-  // should look for one that matches "ttyACM*" or "tty.usbmodem*"
+  // should look for one that matches "ttyACM*" or "tty.usbmodem*" or "COM*"
   for (String port : Serial.list()) {
     println(port);
-    if (match(port, "usbmode|ACM") == null) {
+    if (match(port, "usbmode|ACM|COM") == null)
+    {
       continue;
     }
+    println("Using port", port);
     return new Serial(this, port, 9600);
   }
 
@@ -425,5 +427,3 @@ class Clipping {
     }
   }
 }
-
-
